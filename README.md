@@ -12,6 +12,14 @@ console.log(stl.weight + 'gm');
 ```
 node-stl recognizes by itself whether it is dealing with an ASCII STL or a binary STL file
 
+## install
+
+use [npm](https://npmjs.org):
+
+```shell
+$ npm install node-stl
+```
+
 ## license
 
 MIT
