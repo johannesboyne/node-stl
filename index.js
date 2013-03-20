@@ -49,8 +49,8 @@ function _parseSTLString (stl) {
 	vertexes.forEach(function (vert) {
 		var preVertexHolder = new VertexHolder();
 		vert.match(/vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s/g).forEach(function (vertex, i) {
-			var tempVertex = vertex.replace('vertex', '').match(/[-+]?[0-9]*\.?[0-9]+/g);
-			var preVertex = new Vertex(tempVertex[0],tempVertex[1],tempVertex[2]);
+			var tempVertex	= vertex.replace('vertex', '').match(/[-+]?[0-9]*\.?[0-9]+/g);
+			var preVertex	= new Vertex(tempVertex[0],tempVertex[1],tempVertex[2]);
 			preVertexHolder['vert'+(i+1)] = preVertex;
 		});
 		var partVolume = _triangleVolume(preVertexHolder);
@@ -69,20 +69,22 @@ function _parseSTLString (stl) {
 function _parseSTLBinary (buf) {
 	buf = _toArrayBuffer(buf);
 
-	var headerLength = 80;
-	var dataOffset = 84;
-	var faceLength = 12*4 + 2;
+	var 
+	headerLength	= 80,
+	dataOffset		= 84,
+	faceLength		= 12*4 + 2,
+	le = true; // is little-endian
 
-	var le = true; // is little-endian
-
-	var dvTriangleCount = new DataView(buf, headerLength, 4);
-	var numTriangles = dvTriangleCount.getUint32(0, le);
-	var totalVol = 0;
+	var 
+	dvTriangleCount	= new DataView(buf, headerLength, 4),
+	numTriangles	= dvTriangleCount.getUint32(0, le),
+	totalVol		= 0;
 
 	for (var i = 0; i < numTriangles; i++) {
-		var dv = new DataView(buf, dataOffset + i*faceLength, faceLength);
-		var normal = new Vertex(dv.getFloat32(0, le), dv.getFloat32(4, le), dv.getFloat32(8, le));
-		var vertHolder = new VertexHolder();
+		var 
+		dv			= new DataView(buf, dataOffset + i*faceLength, faceLength),
+		normal		= new Vertex(dv.getFloat32(0, le), dv.getFloat32(4, le), dv.getFloat32(8, le)),
+		vertHolder	= new VertexHolder();
 		for(var v = 3; v < 12; v+=3) {
 			var vert = new Vertex(dv.getFloat32(v*4, le), dv.getFloat32((v+1)*4, le), dv.getFloat32( (v+2)*4, le ) );
 			vertHolder['vert'+(v/3)] = vert;
