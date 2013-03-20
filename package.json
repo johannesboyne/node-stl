@@ -12,6 +12,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "bufferstream": "~0.5.1"
+    "bufferstream": "~0.5.1",
+    "binary": "~0.3.0"
   }
 }
