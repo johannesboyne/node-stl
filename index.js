@@ -1,20 +1,25 @@
 var fs = require('fs');
 
+// Vertex
 function Vertex (v1,v2,v3) {
 	this.v1 = Number(v1);
 	this.v2 = Number(v2);
 	this.v3 = Number(v3);
 }
 
+// Vertex Holder
 function VertexHolder (vertex1,vertex2,vertex3) {
 	this.vert1 = vertex1;
 	this.vert2 = vertex2;
 	this.vert3 = vertex3;
 }
 
-function _toArrayBuffer(buffer) {
-	var ab = new ArrayBuffer(buffer.length);
-	var view = new Uint8Array(ab);
+// transforming a Node.js Buffer into a V8 array buffer
+function _toArrayBuffer (buffer) {
+	var 
+	ab = new ArrayBuffer(buffer.length),
+	view = new Uint8Array(ab);
+	
 	for (var i = 0; i < buffer.length; ++i) {
 		view[i] = buffer[i];
 	}
@@ -92,6 +97,11 @@ function _parseSTLBinary (buf) {
 	}
 }
 
+// NodeStl
+// =======
+// > var stl = NodeStl(__dirname + '/myCool.stl');
+// > console.log(stl.volume + 'cm^3');
+// > console.log(stl.weight + 'gm');
 function NodeStl (stlPath) {
 	var 
 	buf = fs.readFileSync(stlPath),
@@ -105,7 +115,6 @@ function NodeStl (stlPath) {
 		return _parseSTLString(buf.toString());
 	else
 		return _parseSTLBinary(buf);
-
 }
 
 module.exports = NodeStl;

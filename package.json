@@ -7,12 +7,14 @@
     "email": "johannes@boyne.de",
     "url": "http://boyne-developing.de"
   },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/johannesboyne/node-stl.git"
+  },
   "scripts": {
     "test": "mocha"
   },
   "license": "MIT",
   "dependencies": {
-    "bufferstream": "~0.5.1",
-    "binary": "~0.3.0"
   }
 }
