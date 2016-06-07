@@ -36,7 +36,35 @@ function _triangleVolume (vertexHolder) {
 	v132 = Number(vertexHolder.vert1.v1 * vertexHolder.vert3.v2 * vertexHolder.vert2.v3),
 	v213 = Number(vertexHolder.vert2.v1 * vertexHolder.vert1.v2 * vertexHolder.vert3.v3),
 	v123 = Number(vertexHolder.vert1.v1 * vertexHolder.vert2.v2 * vertexHolder.vert3.v3);
+  // 
 	return Number(1.0/6.0)*(-v321 + v231 + v312 - v132 - v213 + v123);
+}
+
+function _boundingBox (vertexHolder) {
+  var minx = 0,  maxx = 0,  miny = 0,  maxy = 0,  minz = 0,  maxz = 0;
+  var tminx = 0, tmaxx = 0, tminy = 0, tmaxy = 0, tminz = 0, tmaxz = 0;
+
+  tminx = Math.min(vertexHolder.vert1.v1, vertexHolder.vert2.v1, vertexHolder.vert3.v1)
+  minx  = tminx < minx ? tminx : minx
+  tmaxx = Math.max(vertexHolder.vert1.v1, vertexHolder.vert2.v1, vertexHolder.vert3.v1)
+  maxx  = tmaxx > maxx ? tmaxx : maxx
+
+
+  tminy = Math.min(vertexHolder.vert1.v2, vertexHolder.vert2.v2, vertexHolder.vert3.v2)
+  miny  = tminy < miny ? tminy : miny
+  tmaxy = Math.max(vertexHolder.vert1.v2, vertexHolder.vert2.v2, vertexHolder.vert3.v2)
+  maxy  = tmaxy > maxy ? tmaxy : maxy
+
+
+  tminz = Math.min(vertexHolder.vert1.v2, vertexHolder.vert2.v2, vertexHolder.vert3.v2)
+  minz  = tminz < minz ? tminz : minz
+  tmaxz = Math.max(vertexHolder.vert1.v2, vertexHolder.vert2.v2, vertexHolder.vert3.v2)
+  maxz  = tmaxz > maxz ? tmaxz : maxz
+
+  var len = maxx - minx;
+  var breadth = maxy - miny;
+  var height = maxz - minz;
+  return [len, breadth, height];
 }
 
 // parsing an STL ASCII string
@@ -46,8 +74,9 @@ function _parseSTLString (stl) {
 	// it was kind of tricky but it is fast and does the job
 	var vertexes = stl.match(/facet\s+normal\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+outer\s+loop\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+endloop\s+endfacet/g);
 
+  var preVertexHolder;
 	vertexes.forEach(function (vert) {
-		var preVertexHolder = new VertexHolder();
+		preVertexHolder = new VertexHolder();
 		vert.match(/vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s/g).forEach(function (vertex, i) {
 			var tempVertex	= vertex.replace('vertex', '').match(/[-+]?[0-9]*\.?[0-9]+/g);
 			var preVertex	= new Vertex(tempVertex[0],tempVertex[1],tempVertex[2]);
@@ -59,8 +88,9 @@ function _parseSTLString (stl) {
 
 	var volumeTotal = Math.abs(totalVol)/1000;
 	return {
-		volume: volumeTotal, 		// cubic cm
-		weight: volumeTotal * 1.04	// gm
+		volume: volumeTotal, 		    // cubic cm
+		weight: volumeTotal * 1.04,	// gm
+    boundingBox: _boundingBox(preVertexHolder),
 	}
 }
 
@@ -94,8 +124,9 @@ function _parseSTLBinary (buf) {
 
 	var volumeTotal = Math.abs(totalVol)/1000;
 	return {
-		volume: volumeTotal,		// cubic cm
-		weight: volumeTotal * 1.04	// gm
+		volume: volumeTotal,		    // cubic cm
+		weight: volumeTotal * 1.04,	// gm
+    boundingBox: _boundingBox(vertHolder),
 	}
 }
 
