@@ -40,31 +40,32 @@ function _triangleVolume (vertexHolder) {
 	return Number(1.0/6.0)*(-v321 + v231 + v312 - v132 - v213 + v123);
 }
 
-function _boundingBox (vertexHolder) {
-  var minx = 0,  maxx = 0,  miny = 0,  maxy = 0,  minz = 0,  maxz = 0;
-  var tminx = 0, tmaxx = 0, tminy = 0, tmaxy = 0, tminz = 0, tmaxz = 0;
+function _boundingBox (vertexes) {
+  if (vertexes.length === 0) return [0,0,0]
+  
+  var minx = Infinity,  maxx = -Infinity,  miny = Infinity,  maxy = -Infinity,  minz = Infinity,  maxz = -Infinity;
+  var tminx = Infinity, tmaxx = -Infinity, tminy = Infinity, tmaxy = -Infinity, tminz = Infinity, tmaxz = -Infinity;
 
-  tminx = Math.min(vertexHolder.vert1.v1, vertexHolder.vert2.v1, vertexHolder.vert3.v1)
-  minx  = tminx < minx ? tminx : minx
-  tmaxx = Math.max(vertexHolder.vert1.v1, vertexHolder.vert2.v1, vertexHolder.vert3.v1)
-  maxx  = tmaxx > maxx ? tmaxx : maxx
-
-
-  tminy = Math.min(vertexHolder.vert1.v2, vertexHolder.vert2.v2, vertexHolder.vert3.v2)
-  miny  = tminy < miny ? tminy : miny
-  tmaxy = Math.max(vertexHolder.vert1.v2, vertexHolder.vert2.v2, vertexHolder.vert3.v2)
-  maxy  = tmaxy > maxy ? tmaxy : maxy
+  vertexes.forEach(function(vertexHolder) {
+    tminx = Math.min(vertexHolder.vert1.v1, vertexHolder.vert2.v1, vertexHolder.vert3.v1)
+    minx  = tminx < minx ? tminx : minx
+    tmaxx = Math.max(vertexHolder.vert1.v1, vertexHolder.vert2.v1, vertexHolder.vert3.v1)
+    maxx  = tmaxx > maxx ? tmaxx : maxx
 
 
-  tminz = Math.min(vertexHolder.vert1.v2, vertexHolder.vert2.v2, vertexHolder.vert3.v2)
-  minz  = tminz < minz ? tminz : minz
-  tmaxz = Math.max(vertexHolder.vert1.v2, vertexHolder.vert2.v2, vertexHolder.vert3.v2)
-  maxz  = tmaxz > maxz ? tmaxz : maxz
+    tminy = Math.min(vertexHolder.vert1.v2, vertexHolder.vert2.v2, vertexHolder.vert3.v2)
+    miny  = tminy < miny ? tminy : miny
+    tmaxy = Math.max(vertexHolder.vert1.v2, vertexHolder.vert2.v2, vertexHolder.vert3.v2)
+    maxy  = tmaxy > maxy ? tmaxy : maxy
 
-  var len = maxx - minx;
-  var breadth = maxy - miny;
-  var height = maxz - minz;
-  return [len, breadth, height];
+
+    tminz = Math.min(vertexHolder.vert1.v3, vertexHolder.vert2.v3, vertexHolder.vert3.v3)
+    minz  = tminz < minz ? tminz : minz
+    tmaxz = Math.max(vertexHolder.vert1.v3, vertexHolder.vert2.v3, vertexHolder.vert3.v3)
+    maxz  = tmaxz > maxz ? tmaxz : maxz
+  });
+
+  return [maxx - minx, maxy - miny, maxz - minz];
 }
 
 // parsing an STL ASCII string
@@ -75,7 +76,8 @@ function _parseSTLString (stl) {
 	var vertexes = stl.match(/facet\s+normal\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+outer\s+loop\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+endloop\s+endfacet/g);
 
   var preVertexHolder;
-	vertexes.forEach(function (vert) {
+  var verteces = Array(vertexes.length)
+	vertexes.forEach(function (vert, i) {
 		preVertexHolder = new VertexHolder();
 		vert.match(/vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s/g).forEach(function (vertex, i) {
 			var tempVertex	= vertex.replace('vertex', '').match(/[-+]?[0-9]*\.?[0-9]+/g);
@@ -84,13 +86,14 @@ function _parseSTLString (stl) {
 		});
 		var partVolume = _triangleVolume(preVertexHolder);
 		totalVol += Number(partVolume);
+    verteces[i] = preVertexHolder
 	})
 
 	var volumeTotal = Math.abs(totalVol)/1000;
 	return {
 		volume: volumeTotal, 		    // cubic cm
 		weight: volumeTotal * 1.04,	// gm
-    boundingBox: _boundingBox(preVertexHolder),
+    boundingBox: _boundingBox(verteces),
 	}
 }
 
@@ -110,6 +113,7 @@ function _parseSTLBinary (buf) {
 	numTriangles	= dvTriangleCount.getUint32(0, le),
 	totalVol		= 0;
 
+  var verteces = Array(numTriangles)
 	for (var i = 0; i < numTriangles; i++) {
 		var 
 		dv			= new DataView(buf, dataOffset + i*faceLength, faceLength),
@@ -120,13 +124,14 @@ function _parseSTLBinary (buf) {
 			vertHolder['vert'+(v/3)] = vert;
 		}
 		totalVol += _triangleVolume(vertHolder);
+    verteces[i] = vertHolder;
 	}
 
 	var volumeTotal = Math.abs(totalVol)/1000;
 	return {
 		volume: volumeTotal,		    // cubic cm
 		weight: volumeTotal * 1.04,	// gm
-    boundingBox: _boundingBox(vertHolder),
+    boundingBox: _boundingBox(verteces),
 	}
 }
 
