@@ -1,7 +1,7 @@
 node-stl
 ========
 
-parse stl files with Node.js and get volume, and weight
+Parse *STL* files with Node.js and get volume, weight, and the bounding box.
 
 ## example
 
