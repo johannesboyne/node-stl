@@ -141,10 +141,13 @@ function _parseSTLBinary (buf) {
 // > console.log(stl.volume + 'cm^3');
 // > console.log(stl.weight + 'gm');
 function NodeStl (stlPath) {
-	var 
-	buf = fs.readFileSync(stlPath),
+	var buf;
+	if(Object.prototype.toString.call(stlPath)=='[object String]')
+		buf = fs.readFileSync(stlPath);
+	else if(Object.prototype.toString.call(stlPath)=='[object Uint8Array]')
+		buf=stlPath;
 	isAscii = true;
-	
+		
 	for (var i=0, len=buf.length; i<len; i++) {
 		if (buf[i] > 127) { isAscii=false; break; }
 	}
