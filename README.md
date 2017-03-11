@@ -33,7 +33,7 @@ request(requestSettings, function(error, response, body) {
 
 ## install
 
-use [npm](https://npmjs.org):
+use [npm/node-stl](https://www.npmjs.com/package/node-stl):
 
 ```shell
 $ npm install node-stl
@@ -45,4 +45,4 @@ MIT
 
 ## Version
 
-`0.1.0`
+`0.2.0`
