@@ -14,9 +14,27 @@ console.log(stl.area,'(m)');          // 91.26 (m)
 ```
 node-stl recognizes by itself whether it is dealing with an ASCII STL or a binary STL file
 
+## load file from url
+
+Use `request` to load a file from url
+
+```javascript
+var request=require('request');
+var requestSettings = {
+   method: 'GET',
+   url: 'https://s3.amazonaws.com/minifactory-stl/WALLY_1plate.stl',
+   encoding: null,
+};
+request(requestSettings, function(error, response, body) {
+    var stl = new NodeStl(body);
+    assert.equal(stl.volume, 21.87511539650792);
+    done(null);
+});
+```
+
 ## install
 
-use [npm](https://npmjs.org):
+use [npm/node-stl](https://www.npmjs.com/package/node-stl):
 
 ```shell
 $ npm install node-stl
@@ -28,4 +46,4 @@ MIT
 
 ## Version
 
-`0.1.0`
+`0.2.0`

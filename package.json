@@ -1,7 +1,11 @@
 {
   "name": "node-stl",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "parse stl files with Node.js and get volume, weight, and bounding box",
+  "contributors": {
+    "name": "Alex J Vazhatharayil",
+    "url": "https://github.com/alexjv89"
+  },
   "author": {
     "name": "Johannes Boyne",
     "email": "johannes@boyne.de",
@@ -17,6 +21,7 @@
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "mocha": "^2.5.3"
+    "mocha": "^2.5.3",
+    "request": "^2.81.0"
   }
 }
