@@ -44,6 +44,11 @@ $ npm install node-stl
 
 MIT
 
-## Version
+## version
 
-`0.2.0`
+`0.3.0`
+
+## contributors
+
+- [alexjv89](https://github.com/alexjv89)
+- [redwildfire13](https://github.com/redwildfire13)
