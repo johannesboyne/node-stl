@@ -206,7 +206,7 @@ const parseSTLBinary = function(buffer) {
 // check if stl is binary vs ASCII
 // (borrowed some code from here: https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/STLLoader.js)
 const isBinary = function(buffer) {
-  let header_size = 84;
+	let header_size = 84;
 
 	if (buffer.length <= header_size) {
 		return false; // an empty binary STL must be at least 84 bytes
