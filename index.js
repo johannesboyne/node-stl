@@ -139,9 +139,7 @@ function parseSTLString(stl) {
 // parsing an STL Binary File
 // (borrowed some code from here: https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/STLLoader.js)
 const parseSTLBinary = function(buffer) {
-	const reader = new DataView(buffer.buffer);
-	const faces = reader.getUint32(80, true);
-
+	const faces = buffer.readUInt32LE(80);
 	const dataOffset = 84;
 	const faceLength = 12 * 4 + 2;
 
@@ -163,9 +161,9 @@ const parseSTLBinary = function(buffer) {
 			const vertexstart = start + i * 12;
 
 			triangle[i - 1] = new Vector3(
-				reader.getFloat32(vertexstart, true),
-				reader.getFloat32(vertexstart + 4, true),
-				reader.getFloat32(vertexstart + 8, true)
+				buffer.readFloatLE(vertexstart, true),
+				buffer.readFloatLE(vertexstart + 4, true),
+				buffer.readFloatLE(vertexstart + 8, true)
 			);
 		}
 
