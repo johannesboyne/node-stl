@@ -26,6 +26,11 @@ describe('should load an STL and measure volume, weight, and area', function () 
     		assert.equal(d.area, 52);
     		assert.equal(d.volume*1000, 24);
 	});
+	it('loads a binary file that starts with solid', function() {
+	  // source for this stl: http://www.thingiverse.com/thing:2462372
+	  var e = new NodeStl(__dirname + '/test_data/002.STL');
+	  assert.equal(e.volume, 48.6251007777451);
+	});
 	it('loads a file buffer', function() {
 		var fs = require('fs');
 		var file_buf = fs.readFileSync(__dirname + '/test_data/WALLY_1plate.stl');
