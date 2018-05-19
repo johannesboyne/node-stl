@@ -218,20 +218,19 @@ const isBinary = function(buffer) {
 
 	// An ASCII STL data must begin with 'solid ' as the first six bytes.
 	// However, ASCII STLs lacking the SPACE after the 'd' are known to be
-	// plentiful.  So, check the first 5 bytes for 'solid'.
-
-	// US-ASCII ordinal values for 's', 'o', 'l', 'i', 'd'
-	let solid = [115, 111, 108, 105, 100];
-
-	for (let i = 0; i < 5; i++) {
-		// If solid[ i ] does not match the i-th byte, then it is not an
-		// ASCII STL; hence, it is binary and return true.
-
-		if (solid[i] !== reader.getUint8(i)) return true;
+	// plentiful.  There are also many binary STL that start with solid
+	// regardless of this standard, so we check if offset 80, the location of
+	// the number of triangles in a binary STL matches the expected file size.
+	const HEADER_SIZE = 84;
+	if (buffer.length <= HEADER_SIZE) {
+		return false; // an empty binary STL must be at least 84 bytes
 	}
 
-	// First 5 bytes read "solid"; declare it to be an ASCII STL
-	return false;
+	const SIZE_PER_TRIANGLE = 50;
+	const NUMBER_OF_TRIANGLES = buffer.readUInt32LE(80);
+	const EXPECTED_FILE_SIZE = NUMBER_OF_TRIANGLES * SIZE_PER_TRIANGLE + HEADER_SIZE;
+
+	return buffer.length === EXPECTED_FILE_SIZE;
 };
 
 // NodeStl
