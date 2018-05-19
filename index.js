@@ -206,31 +206,24 @@ const parseSTLBinary = function(buffer) {
 // check if stl is binary vs ASCII
 // (borrowed some code from here: https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/STLLoader.js)
 const isBinary = function(buffer) {
-	let expect, face_size, n_faces, reader;
-	reader = new DataView(buffer.buffer);
-	face_size = 32 / 8 * 3 + 32 / 8 * 3 * 3 + 16 / 8;
-	n_faces = reader.getUint32(80, true);
-	expect = 80 + 32 / 8 + n_faces * face_size;
+  let header_size = 84;
 
-	if (expect === reader.byteLength) {
-		return true;
-	}
-
-	// An ASCII STL data must begin with 'solid ' as the first six bytes.
-	// However, ASCII STLs lacking the SPACE after the 'd' are known to be
-	// plentiful.  There are also many binary STL that start with solid
-	// regardless of this standard, so we check if offset 80, the location of
-	// the number of triangles in a binary STL matches the expected file size.
-	const HEADER_SIZE = 84;
-	if (buffer.length <= HEADER_SIZE) {
+	if (buffer.length <= header_size) {
 		return false; // an empty binary STL must be at least 84 bytes
 	}
 
-	const SIZE_PER_TRIANGLE = 50;
-	const NUMBER_OF_TRIANGLES = buffer.readUInt32LE(80);
-	const EXPECTED_FILE_SIZE = NUMBER_OF_TRIANGLES * SIZE_PER_TRIANGLE + HEADER_SIZE;
+	let expected_size, face_size, n_faces;
+	face_size = 50;
+	n_faces = buffer.readUInt32LE(80);
 
-	return buffer.length === EXPECTED_FILE_SIZE;
+	// An ASCII STL data must begin with 'solid ' as the first six bytes.
+	// However, ASCII STLs lacking the SPACE after the 'd' are known to be
+	// plentiful. There are also many binary STL that start with solid
+	// regardless of this standard, so we check if offset 80, the location of
+	// the number of triangles in a binary STL matches the expected file size.
+	
+	expected_size = header_size + n_faces * face_size;
+	return buffer.length === expected_size;
 };
 
 // NodeStl
