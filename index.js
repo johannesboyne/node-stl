@@ -139,9 +139,7 @@ function parseSTLString(stl) {
 // parsing an STL Binary File
 // (borrowed some code from here: https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/STLLoader.js)
 const parseSTLBinary = function(buffer) {
-	const reader = new DataView(buffer.buffer);
-	const faces = reader.getUint32(80, true);
-
+	const faces = buffer.readUInt32LE(80);
 	const dataOffset = 84;
 	const faceLength = 12 * 4 + 2;
 
@@ -163,9 +161,9 @@ const parseSTLBinary = function(buffer) {
 			const vertexstart = start + i * 12;
 
 			triangle[i - 1] = new Vector3(
-				reader.getFloat32(vertexstart, true),
-				reader.getFloat32(vertexstart + 4, true),
-				reader.getFloat32(vertexstart + 8, true)
+				buffer.readFloatLE(vertexstart, true),
+				buffer.readFloatLE(vertexstart + 4, true),
+				buffer.readFloatLE(vertexstart + 8, true)
 			);
 		}
 
@@ -208,32 +206,24 @@ const parseSTLBinary = function(buffer) {
 // check if stl is binary vs ASCII
 // (borrowed some code from here: https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/STLLoader.js)
 const isBinary = function(buffer) {
-	let expect, face_size, n_faces, reader;
-	reader = new DataView(buffer.buffer);
-	face_size = 32 / 8 * 3 + 32 / 8 * 3 * 3 + 16 / 8;
-	n_faces = reader.getUint32(80, true);
-	expect = 80 + 32 / 8 + n_faces * face_size;
+	let header_size = 84;
 
-	if (expect === reader.byteLength) {
-		return true;
+	if (buffer.length <= header_size) {
+		return false; // an empty binary STL must be at least 84 bytes
 	}
+
+	let expected_size, face_size, n_faces;
+	face_size = 50;
+	n_faces = buffer.readUInt32LE(80);
 
 	// An ASCII STL data must begin with 'solid ' as the first six bytes.
 	// However, ASCII STLs lacking the SPACE after the 'd' are known to be
-	// plentiful.  So, check the first 5 bytes for 'solid'.
-
-	// US-ASCII ordinal values for 's', 'o', 'l', 'i', 'd'
-	let solid = [115, 111, 108, 105, 100];
-
-	for (let i = 0; i < 5; i++) {
-		// If solid[ i ] does not match the i-th byte, then it is not an
-		// ASCII STL; hence, it is binary and return true.
-
-		if (solid[i] !== reader.getUint8(i)) return true;
-	}
-
-	// First 5 bytes read "solid"; declare it to be an ASCII STL
-	return false;
+	// plentiful. There are also many binary STL that start with solid
+	// regardless of this standard, so we check if offset 80, the location of
+	// the number of triangles in a binary STL matches the expected file size.
+	
+	expected_size = header_size + n_faces * face_size;
+	return buffer.length === expected_size;
 };
 
 // NodeStl
