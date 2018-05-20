@@ -1,6 +1,6 @@
 {
   "name": "node-stl",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "parse stl files with Node.js and get volume, weight, and bounding box",
   "contributors": [
     {
@@ -10,6 +10,14 @@
     {
       "name": "Island Games Studio",
       "url": "https://github.com/redwildfire13"
+    },
+    {
+      "name": "lexe11",
+      "url": "https://github.com/lexe11"
+    },
+    {
+      "name": "Renari",
+      "url": "https://github.com/Renari"
     }
   ],
   "author": {

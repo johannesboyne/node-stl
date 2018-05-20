@@ -46,10 +46,11 @@ MIT
 
 ## version
 
-`0.4.0`
+`0.5.0`
 
 ## contributors
 
 - [alexjv89](https://github.com/alexjv89)
 - [redwildfire13](https://github.com/redwildfire13)
 - [lexe11](https://github.com/lexe11)
+- [Renari](https://github.com/Renari)
