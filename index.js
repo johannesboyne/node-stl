@@ -98,6 +98,8 @@ class STLMeasures {
 		const tmaxz = Math.max(triangle[0].z, triangle[1].z, triangle[2].z);
 		this.maxz = tmaxz > this.maxz ? tmaxz : this.maxz;
 
+    // Center of Mass calculation
+    // adapted from c++ at: https://stackoverflow.com/a/2085502/6482703
     this.xCenter += ((triangle[0].x + triangle[1].x + triangle[2].x) / 4) * currentVolume;
     this.yCenter += ((triangle[0].y + triangle[1].y + triangle[2].y) / 4) * currentVolume;
     this.zCenter += ((triangle[0].z + triangle[1].z + triangle[2].z) / 4) * currentVolume;
