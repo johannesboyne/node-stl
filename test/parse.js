@@ -25,12 +25,15 @@ describe('should load an STL and measure volume, weight, and area', function () 
 		var d = new NodeStl(__dirname + '/test_data/box_2x3x4.stl');
 		assert.equal(d.area, 52);
 		assert.equal(d.volume*1000, 24);
+		assert.deepEqual(d.centerOfMass, [0,0,0]);
 	});
 	it('loads the box_3x3x3_offset with area of 54 and volume of 27', function() {
 		var d = new NodeStl(__dirname + '/test_data/box_3x3x3_offset.stl');
 		assert.equal(d.area, 54);
     // toPrecision because the calculation is off due to JS accuracy issues
 		assert.equal(d.volume.toPrecision(6), 0.027);
+		assert.deepEqual(d.centerOfMass.map(function (x) {return Number(x.toPrecision(6))}),
+      [1.50001,1.5,1.5]);
 	});
 	it('loads a binary file that starts with solid', function() {
 	  // source for this stl: http://www.thingiverse.com/thing:2462372

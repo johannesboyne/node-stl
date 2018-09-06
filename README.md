@@ -1,7 +1,7 @@
 node-stl
 ========
 
-Parse *STL* files with Node.js and get volume, weight, and the bounding box.
+Parse *STL* files with Node.js and get volume, weight, the bounding box, and the center of mass.
 
 ## example
 
@@ -11,6 +11,7 @@ console.log(stl.volume + 'cm^3');     // 21cm^3
 console.log(stl.weight + 'gm');       //  1gm
 console.log(stl.boundingBox,'(mm)');  // [60,45,50] (mm)
 console.log(stl.area,'(m)');          // 91.26 (m)
+console.log(stl.centerOfMass,'(mm)'); // [30,22.5,25] (mm)
 ```
 node-stl recognizes by itself whether it is dealing with an ASCII STL or a binary STL file
 

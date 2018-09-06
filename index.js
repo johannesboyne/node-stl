@@ -3,9 +3,9 @@ var fs = require('fs');
 // 3d Vector x,y,z
 class Vector3 {
 	constructor(x, y, z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		this.x = Number(x);
+		this.y = Number(y);
+		this.z = Number(z);
 	}
 
 	// Create a copy of the Vector
@@ -65,10 +65,14 @@ class STLMeasures {
   	this.maxy = -Infinity;
   	this.minz = Infinity;
   	this.maxz = -Infinity;
+    this.xCenter = 0,
+    this.yCenter = 0,
+    this.zCenter = 0;
   }
 
   addTriangle(triangle) {
- 		this.volume += _triangleVolume(triangle);
+    let currentVolume = _triangleVolume(triangle);
+ 		this.volume += currentVolume;
 
 		const ab = triangle[1].clone().sub(triangle[0]);
 		const ac = triangle[2].clone().sub(triangle[0]);
@@ -93,15 +97,25 @@ class STLMeasures {
 		this.minz = tminz < this.minz ? tminz : this.minz;
 		const tmaxz = Math.max(triangle[0].z, triangle[1].z, triangle[2].z);
 		this.maxz = tmaxz > this.maxz ? tmaxz : this.maxz;
+
+    this.xCenter += ((triangle[0].x + triangle[1].x + triangle[2].x) / 4) * currentVolume;
+    this.yCenter += ((triangle[0].y + triangle[1].y + triangle[2].y) / 4) * currentVolume;
+    this.zCenter += ((triangle[0].z + triangle[1].z + triangle[2].z) / 4) * currentVolume;
   }
 
   finalize() {
   	const volumeTotal = Math.abs(this.volume) / 1000;
+
+    this.xCenter /= this.volume;
+    this.yCenter /= this.volume;
+    this.zCenter /= this.volume;
+
   	return {
   		volume: volumeTotal, // cubic cm
   		weight: volumeTotal * 1.04, // gm
   		boundingBox: [this.maxx - this.minx, this.maxy - this.miny, this.maxz - this.minz],
-  		area: this.area
+  		area: this.area,
+      centerOfMass: [this.xCenter, this.yCenter, this.zCenter],
   	};
   }
 }
