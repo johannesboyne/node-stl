@@ -95,7 +95,7 @@ function parseSTLString(stl) {
 			.forEach(function(vertex, i) {
 				let vector = vertex
 					.replace('vertex', '')
-					.match(/[-+]?[0-9]*\.?[0-9]+/g);
+					.match(/[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?/g);
 
 				triangle[i] = new Vector3(vector[0], vector[1], vector[2]);
 			});
