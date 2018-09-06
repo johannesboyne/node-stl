@@ -7,7 +7,7 @@ describe('should load an STL and measure volume, weight, and area', function () 
 	it('load an ascii file', function() {
 		// source for this stl: http://www.thingiverse.com/thing:47956
 		var a = new NodeStl(__dirname + '/test_data/WALLY_1plate.stl');
-		assert.equal(a.volume, 21.87511539650792);
+		assert.equal(a.volume, 22.86382329248822);
 	});
 	it('load a binary file', function() {
 		// source for this stl: http://www.thingiverse.com/thing:61532
@@ -41,7 +41,7 @@ describe('should load an STL and measure volume, weight, and area', function () 
 		var fs = require('fs');
 		var file_buf = fs.readFileSync(__dirname + '/test_data/WALLY_1plate.stl');
 		var a = new NodeStl(file_buf);
-		assert.equal(a.volume, 21.87511539650792);
+		assert.equal(a.volume, 22.86382329248822);
 	});
 	it('loads a file from url',function(done){
 		var requestSettings = {
@@ -51,7 +51,7 @@ describe('should load an STL and measure volume, weight, and area', function () 
 		};
 		request(requestSettings, function(error, response, file) {
 			var a = new NodeStl(file);
-			assert.equal(a.volume, 21.87511539650792);
+			assert.equal(a.volume, 22.86382329248822);
 			done(null);
 		});
 	}).timeout('5000');
