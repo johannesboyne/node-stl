@@ -54,3 +54,4 @@ MIT
 - [redwildfire13](https://github.com/redwildfire13)
 - [lexe11](https://github.com/lexe11)
 - [Renari](https://github.com/Renari)
+- [jacekkopecky](https://github.com/jacekkopecky)
