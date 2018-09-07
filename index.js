@@ -65,8 +65,8 @@ class STLMeasures {
 		this.maxy = -Infinity;
 		this.minz = Infinity;
 		this.maxz = -Infinity;
-		this.xCenter = 0,
-		this.yCenter = 0,
+		this.xCenter = 0;
+		this.yCenter = 0;
 		this.zCenter = 0;
 	}
 
