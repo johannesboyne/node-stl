@@ -56,23 +56,23 @@ class Vector3 {
 }
 
 class STLMeasures {
-  constructor() {
-  	this.volume = 0;
-  	this.area = 0;
-  	this.minx = Infinity;
-  	this.maxx = -Infinity;
-  	this.miny = Infinity;
-  	this.maxy = -Infinity;
-  	this.minz = Infinity;
-  	this.maxz = -Infinity;
-    this.xCenter = 0,
-    this.yCenter = 0,
-    this.zCenter = 0;
-  }
+	constructor() {
+		this.volume = 0;
+		this.area = 0;
+		this.minx = Infinity;
+		this.maxx = -Infinity;
+		this.miny = Infinity;
+		this.maxy = -Infinity;
+		this.minz = Infinity;
+		this.maxz = -Infinity;
+		this.xCenter = 0,
+		this.yCenter = 0,
+		this.zCenter = 0;
+	}
 
-  addTriangle(triangle) {
-    let currentVolume = _triangleVolume(triangle);
- 		this.volume += currentVolume;
+	addTriangle(triangle) {
+		let currentVolume = _triangleVolume(triangle);
+		this.volume += currentVolume;
 
 		const ab = triangle[1].clone().sub(triangle[0]);
 		const ac = triangle[2].clone().sub(triangle[0]);
@@ -98,28 +98,28 @@ class STLMeasures {
 		const tmaxz = Math.max(triangle[0].z, triangle[1].z, triangle[2].z);
 		this.maxz = tmaxz > this.maxz ? tmaxz : this.maxz;
 
-    // Center of Mass calculation
-    // adapted from c++ at: https://stackoverflow.com/a/2085502/6482703
-    this.xCenter += ((triangle[0].x + triangle[1].x + triangle[2].x) / 4) * currentVolume;
-    this.yCenter += ((triangle[0].y + triangle[1].y + triangle[2].y) / 4) * currentVolume;
-    this.zCenter += ((triangle[0].z + triangle[1].z + triangle[2].z) / 4) * currentVolume;
-  }
+		// Center of Mass calculation
+		// adapted from c++ at: https://stackoverflow.com/a/2085502/6482703
+		this.xCenter += ((triangle[0].x + triangle[1].x + triangle[2].x) / 4) * currentVolume;
+		this.yCenter += ((triangle[0].y + triangle[1].y + triangle[2].y) / 4) * currentVolume;
+		this.zCenter += ((triangle[0].z + triangle[1].z + triangle[2].z) / 4) * currentVolume;
+	}
 
-  finalize() {
-  	const volumeTotal = Math.abs(this.volume) / 1000;
+	finalize() {
+		const volumeTotal = Math.abs(this.volume) / 1000;
 
-    this.xCenter /= this.volume;
-    this.yCenter /= this.volume;
-    this.zCenter /= this.volume;
+		this.xCenter /= this.volume;
+		this.yCenter /= this.volume;
+		this.zCenter /= this.volume;
 
-  	return {
-  		volume: volumeTotal, // cubic cm
-  		weight: volumeTotal * 1.04, // gm
-  		boundingBox: [this.maxx - this.minx, this.maxy - this.miny, this.maxz - this.minz],
-  		area: this.area,
-      centerOfMass: [this.xCenter, this.yCenter, this.zCenter],
-  	};
-  }
+		return {
+			volume: volumeTotal, // cubic cm
+			weight: volumeTotal * 1.04, // gm
+			boundingBox: [this.maxx - this.minx, this.maxy - this.miny, this.maxz - this.minz],
+			area: this.area,
+			centerOfMass: [this.xCenter, this.yCenter, this.zCenter],
+		};
+	}
 }
 
 // calculation of the triangle volume
@@ -143,7 +143,7 @@ function parseSTLString(stl) {
 		/facet\s+normal\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+outer\s+loop\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+endloop\s+endfacet/g
 	);
 
-  let measures = new STLMeasures();
+	let measures = new STLMeasures();
 
 	vertexes.forEach(function(vert) {
 		const triangle = new Array(3);
@@ -159,10 +159,10 @@ function parseSTLString(stl) {
 				triangle[i] = new Vector3(vector[0], vector[1], vector[2]);
 			});
 
-      measures.addTriangle(triangle);
+			measures.addTriangle(triangle);
 	});
 
-  return measures.finalize();
+	return measures.finalize();
 }
 
 // parsing an STL Binary File
@@ -172,7 +172,7 @@ const parseSTLBinary = function(buffer) {
 	const dataOffset = 84;
 	const faceLength = 12 * 4 + 2;
 
-  let measures = new STLMeasures();
+	let measures = new STLMeasures();
 
 	for (let face = 0; face < faces; face++) {
 		const start = dataOffset + face * faceLength;
@@ -189,10 +189,10 @@ const parseSTLBinary = function(buffer) {
 			);
 		}
 
-    measures.addTriangle(triangle);
+		measures.addTriangle(triangle);
 	}
 
-  return measures.finalize();
+	return measures.finalize();
 };
 
 // check if stl is binary vs ASCII
