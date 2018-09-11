@@ -3,9 +3,9 @@ var fs = require('fs');
 // 3d Vector x,y,z
 class Vector3 {
 	constructor(x, y, z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		this.x = Number(x);
+		this.y = Number(y);
+		this.z = Number(z);
 	}
 
 	// Create a copy of the Vector
@@ -55,6 +55,73 @@ class Vector3 {
 	}
 }
 
+class STLMeasures {
+	constructor() {
+		this.volume = 0;
+		this.area = 0;
+		this.minx = Infinity;
+		this.maxx = -Infinity;
+		this.miny = Infinity;
+		this.maxy = -Infinity;
+		this.minz = Infinity;
+		this.maxz = -Infinity;
+		this.xCenter = 0;
+		this.yCenter = 0;
+		this.zCenter = 0;
+	}
+
+	addTriangle(triangle) {
+		let currentVolume = _triangleVolume(triangle);
+		this.volume += currentVolume;
+
+		const ab = triangle[1].clone().sub(triangle[0]);
+		const ac = triangle[2].clone().sub(triangle[0]);
+
+		this.area +=
+			ab
+				.clone()
+				.cross(ac)
+				.length() / 2;
+
+		const tminx = Math.min(triangle[0].x, triangle[1].x, triangle[2].x);
+		this.minx = tminx < this.minx ? tminx : this.minx;
+		const tmaxx = Math.max(triangle[0].x, triangle[1].x, triangle[2].x);
+		this.maxx = tmaxx > this.maxx ? tmaxx : this.maxx;
+
+		const tminy = Math.min(triangle[0].y, triangle[1].y, triangle[2].y);
+		this.miny = tminy < this.miny ? tminy : this.miny;
+		const tmaxy = Math.max(triangle[0].y, triangle[1].y, triangle[2].y);
+		this.maxy = tmaxy > this.maxy ? tmaxy : this.maxy;
+
+		const tminz = Math.min(triangle[0].z, triangle[1].z, triangle[2].z);
+		this.minz = tminz < this.minz ? tminz : this.minz;
+		const tmaxz = Math.max(triangle[0].z, triangle[1].z, triangle[2].z);
+		this.maxz = tmaxz > this.maxz ? tmaxz : this.maxz;
+
+		// Center of Mass calculation
+		// adapted from c++ at: https://stackoverflow.com/a/2085502/6482703
+		this.xCenter += ((triangle[0].x + triangle[1].x + triangle[2].x) / 4) * currentVolume;
+		this.yCenter += ((triangle[0].y + triangle[1].y + triangle[2].y) / 4) * currentVolume;
+		this.zCenter += ((triangle[0].z + triangle[1].z + triangle[2].z) / 4) * currentVolume;
+	}
+
+	finalize() {
+		const volumeTotal = Math.abs(this.volume) / 1000;
+
+		this.xCenter /= this.volume;
+		this.yCenter /= this.volume;
+		this.zCenter /= this.volume;
+
+		return {
+			volume: volumeTotal, // cubic cm
+			weight: volumeTotal * 1.04, // gm
+			boundingBox: [this.maxx - this.minx, this.maxy - this.miny, this.maxz - this.minz],
+			area: this.area,
+			centerOfMass: [this.xCenter, this.yCenter, this.zCenter],
+		};
+	}
+}
+
 // calculation of the triangle volume
 // source: http://stackoverflow.com/questions/6518404/how-do-i-calculate-the-volume-of-an-object-stored-in-stl-files
 function _triangleVolume(triangle) {
@@ -70,24 +137,16 @@ function _triangleVolume(triangle) {
 
 // parsing an STL ASCII string
 function parseSTLString(stl) {
-	let volume = 0;
-	let area = 0;
-	let minx = Infinity,
-		maxx = -Infinity,
-		miny = Infinity,
-		maxy = -Infinity,
-		minz = Infinity,
-		maxz = -Infinity;
-
 	// yes, this is the regular expression, matching the vertexes
 	// it was kind of tricky but it is fast and does the job
 	let vertexes = stl.match(
 		/facet\s+normal\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+outer\s+loop\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+endloop\s+endfacet/g
 	);
 
-	let triangle;
+	let measures = new STLMeasures();
+
 	vertexes.forEach(function(vert) {
-		triangle = new Array(3);
+		const triangle = new Array(3);
 		vert
 			.match(
 				/vertex\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s+([-+]?\b(?:[0-9]*\.)?[0-9]+(?:[eE][-+]?[0-9]+)?\b)\s/g
@@ -100,40 +159,10 @@ function parseSTLString(stl) {
 				triangle[i] = new Vector3(vector[0], vector[1], vector[2]);
 			});
 
-		volume += _triangleVolume(triangle);
-
-		const ab = triangle[1].clone().sub(triangle[0]);
-		const ac = triangle[2].clone().sub(triangle[0]);
-
-		area +=
-			ab
-				.clone()
-				.cross(ac)
-				.length() / 2;
-
-		const tminx = Math.min(triangle[0].x, triangle[1].x, triangle[2].x);
-		minx = tminx < minx ? tminx : minx;
-		const tmaxx = Math.max(triangle[0].x, triangle[1].x, triangle[2].x);
-		maxx = tmaxx > maxx ? tmaxx : maxx;
-
-		const tminy = Math.min(triangle[0].y, triangle[1].y, triangle[2].y);
-		miny = tminy < miny ? tminy : miny;
-		const tmaxy = Math.max(triangle[0].y, triangle[1].y, triangle[2].y);
-		maxy = tmaxy > maxy ? tmaxy : maxy;
-
-		const tminz = Math.min(triangle[0].z, triangle[1].z, triangle[2].z);
-		minz = tminz < minz ? tminz : minz;
-		const tmaxz = Math.max(triangle[0].z, triangle[1].z, triangle[2].z);
-		maxz = tmaxz > maxz ? tmaxz : maxz;
+			measures.addTriangle(triangle);
 	});
 
-	let volumeTotal = Math.abs(volume) / 1000;
-	return {
-		volume: volumeTotal, // cubic cm
-		weight: volumeTotal * 1.04, // gm
-		boundingBox: [maxx - minx, maxy - miny, maxz - minz],
-		area: area
-	};
+	return measures.finalize();
 }
 
 // parsing an STL Binary File
@@ -143,14 +172,7 @@ const parseSTLBinary = function(buffer) {
 	const dataOffset = 84;
 	const faceLength = 12 * 4 + 2;
 
-	let volume = 0;
-	let area = 0;
-	let minx = Infinity,
-		maxx = -Infinity,
-		miny = Infinity,
-		maxy = -Infinity,
-		minz = Infinity,
-		maxz = -Infinity;
+	let measures = new STLMeasures();
 
 	for (let face = 0; face < faces; face++) {
 		const start = dataOffset + face * faceLength;
@@ -167,40 +189,10 @@ const parseSTLBinary = function(buffer) {
 			);
 		}
 
-		volume += _triangleVolume(triangle);
-
-		const ab = triangle[1].clone().sub(triangle[0]);
-		const ac = triangle[2].clone().sub(triangle[0]);
-
-		area +=
-			ab
-				.clone()
-				.cross(ac)
-				.length() / 2;
-
-		const tminx = Math.min(triangle[0].x, triangle[1].x, triangle[2].x);
-		minx = tminx < minx ? tminx : minx;
-		const tmaxx = Math.max(triangle[0].x, triangle[1].x, triangle[2].x);
-		maxx = tmaxx > maxx ? tmaxx : maxx;
-
-		const tminy = Math.min(triangle[0].y, triangle[1].y, triangle[2].y);
-		miny = tminy < miny ? tminy : miny;
-		const tmaxy = Math.max(triangle[0].y, triangle[1].y, triangle[2].y);
-		maxy = tmaxy > maxy ? tmaxy : maxy;
-
-		const tminz = Math.min(triangle[0].z, triangle[1].z, triangle[2].z);
-		minz = tminz < minz ? tminz : minz;
-		const tmaxz = Math.max(triangle[0].z, triangle[1].z, triangle[2].z);
-		maxz = tmaxz > maxz ? tmaxz : maxz;
+		measures.addTriangle(triangle);
 	}
 
-	volume = Math.abs(volume) / 1000;
-	return {
-		volume: volume, // cubic cm
-		weight: volume * 1.04, // gm
-		boundingBox: [maxx - minx, maxy - miny, maxz - minz],
-		area: area
-	};
+	return measures.finalize();
 };
 
 // check if stl is binary vs ASCII
