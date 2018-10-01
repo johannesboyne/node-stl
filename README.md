@@ -1,6 +1,8 @@
 node-stl
 ========
 
+[![CircleCI](https://circleci.com/gh/johannesboyne/node-stl.svg?style=svg)](https://circleci.com/gh/johannesboyne/node-stl)
+
 Parse *STL* files with Node.js and get volume, weight, the bounding box, and the center of mass.
 
 ## example
