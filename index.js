@@ -155,10 +155,8 @@ function parseSTLString(stl) {
 				let vector = vertex
 					.replace('vertex', '')
 					.match(/[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?/g);
-        const x = vector[0] * Math.pow(10, Number(vector[1]))
-        const y = vector[2] * Math.pow(10, Number(vector[3]))
-        const z = vector[4] * Math.pow(10, Number(vector[5]))
-        triangle[i] = new Vector3(x, y, z)
+
+				triangle[i] = new Vector3(vector[0], vector[1], vector[2]);
 			});
 
 			measures.addTriangle(triangle);
