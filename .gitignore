@@ -7,11 +7,10 @@ lib-cov
 *.pid
 *.gz
 .DS_Store
-
+.idea
 pids
 logs
 results
 node_modules
 
 npm-debug.log
-package-lock.json
