@@ -8,6 +8,8 @@ Parse *STL* files with Node.js and get volume, weight, the bounding box, and the
 ## example
 
 ```javascript
+const NodeStl = require("node-stl");
+
 var stl = NodeStl(__dirname + '/myCool.stl', {density: 1.04});
 console.log(stl.volume + 'cm^3');     // 21cm^3
 console.log(stl.weight + 'gm');       //  1gm
@@ -22,12 +24,15 @@ node-stl recognizes by itself whether it is dealing with an ASCII STL or a binar
 Use `request` to load a file from url
 
 ```javascript
-var request=require('request');
-var requestSettings = {
+const NodeStl = require("node-stl");
+const request = require('request');
+
+const requestSettings = {
    method: 'GET',
    url: 'https://s3.amazonaws.com/minifactory-stl/WALLY_1plate.stl',
    encoding: null,
 };
+
 request(requestSettings, function(error, response, body) {
     var stl = new NodeStl(body);
     assert.equal(stl.volume, 21.87511539650792);
