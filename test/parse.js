@@ -74,4 +74,10 @@ describe("should load an STL and measure volume, weight, and area", function() {
     let b = new NodeStl(__dirname + "/test_data/RasPiCaseLight.stl", config);
     assert.equal(b.weight, 1.3649123098799019);
   });
+
+  it("works with box.stl binary", function() {
+    // source for this stl: http://www.thingiverse.com/thing:61532
+    let b = new NodeStl(__dirname + "/test_data/box.stl");
+    assert.equal(b.weight, 145.60593212682824);
+  });
 });
