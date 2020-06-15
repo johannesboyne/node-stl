@@ -1,6 +1,6 @@
 {
   "name": "node-stl",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "parse stl files with Node.js and get volume, weight, bounding box, and center of mass",
   "contributors": [
     {
@@ -22,6 +22,10 @@
     {
       "name": "jacekkopecky",
       "url": "https://github.com/jacekkopecky"
+    },
+    {
+      "name": "Yonatan Wolowelsky",
+      "url": "https://github.com/grmmph"
     }
   ],
   "author": {
