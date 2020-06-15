@@ -139,18 +139,10 @@ class NodeStl {
    * @returns {boolean}
    */
   static _isBinary(buffer) {
-    const HEADER_SIZE = 84;
-    const MAX_ASCII_CHAR_CODE = 127;
-    const str = buffer.toString()
+    let header_size = 84;
 
-    if (buffer.length <= HEADER_SIZE) {
+    if (buffer.length <= header_size) {
       return false; // an empty binary STL must be at least 84 bytes
-    }
-
-    for (var i = 0, strLen = str.length; i < strLen; ++i) {
-      if (str.charCodeAt(i) > MAX_ASCII_CHAR_CODE) {
-        return true;
-      }
     }
 
     let expected_size, face_size, n_faces;
