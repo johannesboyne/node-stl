@@ -163,7 +163,7 @@ class NodeStl {
     // regardless of this standard, so we check if offset 80, the location of
     // the number of triangles in a binary STL matches the expected file size.
 
-    expected_size = header_size + n_faces * face_size;
+    expected_size = HEADER_SIZE + n_faces * face_size;
     return buffer.length === expected_size;
   }
 
