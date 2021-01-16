@@ -1,6 +1,6 @@
 {
   "name": "node-stl",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "parse stl files with Node.js and get volume, weight, bounding box, and center of mass",
   "contributors": [
     {
@@ -44,7 +44,7 @@
   "dependencies": {},
   "devDependencies": {
     "minimist": ">=0.2.1",
-    "mocha": "^8.0.1",
+    "mocha": "^8.2.1",
     "prettier": "^1.15.2",
     "request": "^2.88.0"
   }
