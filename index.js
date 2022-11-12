@@ -140,10 +140,10 @@ class NodeStl {
    */
   static _isBinary(buffer) {
     const MAX_ASCII_CHAR_CODE = 127;
-    const header_size = 84;
+    const HEADER_SIZE = 84;
     const str = buffer.toString()
 
-    if (buffer.length <= header_size) {
+    if (buffer.length <= HEADER_SIZE) {
       return false; // an empty binary STL must be at least 84 bytes
     }
 
