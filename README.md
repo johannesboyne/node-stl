@@ -3,7 +3,7 @@ node-stl
 
 [![CircleCI](https://circleci.com/gh/johannesboyne/node-stl.svg?style=svg)](https://circleci.com/gh/johannesboyne/node-stl)
 
-Parse *STL* files with Node.js and get volume, weight, the bounding box, and the center of mass.
+Parse *STL* files with Node.js and get volume, weight, the bounding box, the center of mass and whether it is watertight or not.
 
 ## example
 
@@ -16,6 +16,7 @@ console.log(stl.weight + 'gm');       //  1gm
 console.log(stl.boundingBox,'(mm)');  // [60,45,50] (mm)
 console.log(stl.area,'(m)');          // 91.26 (m)
 console.log(stl.centerOfMass,'(mm)'); // [30,22.5,25] (mm)
+console.log(stl.isWatertight ? 'STL is watertight' : 'STL is not watertight');
 ```
 node-stl recognizes by itself whether it is dealing with an ASCII STL or a binary STL file
 
@@ -64,3 +65,4 @@ MIT
 - [Renari](https://github.com/Renari)
 - [jacekkopecky](https://github.com/jacekkopecky)
 - [grmmph](https://github.com/grmmph)
+- [gokhangulgezen](https://github.com/gokhangulgezen)

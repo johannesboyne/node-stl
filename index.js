@@ -20,6 +20,7 @@ class STLMeasures {
     this.xCenter = 0;
     this.yCenter = 0;
     this.zCenter = 0;
+    this.edges = [];
   }
   /**
    * calculation of the triangle volume
@@ -79,11 +80,17 @@ class STLMeasures {
       ((triangle[0].y + triangle[1].y + triangle[2].y) / 4) * currentVolume;
     this.zCenter +=
       ((triangle[0].z + triangle[1].z + triangle[2].z) / 4) * currentVolume;
+    
+    // edge array
+    // edge: {v: [] - vector coordinates, p: int - pair edge index}
+    this.edges.push({v: [triangle[0].x, triangle[0].y, triangle[0].z, triangle[1].x, triangle[1].y, triangle[1].z], p: undefined}, 
+      {v: [triangle[1].x, triangle[1].y, triangle[1].z, triangle[2].x, triangle[2].y, triangle[2].z], p: undefined},
+      {v: [triangle[2].x, triangle[2].y, triangle[2].z, triangle[0].x, triangle[0].y, triangle[0].z], p: undefined});
   }
 
   /**
    * calculates final measurements
-   * @returns {{volume: number, weight: number, boundingBox: number[], area: number, centerOfMass: number[]}}
+   * @returns {{volume: number, weight: number, boundingBox: number[], area: number, centerOfMass: number[], isWatertight: boolean}}
    */
   finalize() {
     const volumeTotal = Math.abs(this.volume) / 1000;
@@ -101,8 +108,109 @@ class STLMeasures {
         this.maxz - this.minz
       ],
       area: this.area,
-      centerOfMass: [this.xCenter, this.yCenter, this.zCenter]
+      centerOfMass: [this.xCenter, this.yCenter, this.zCenter],
+      isWatertight: this._isWatertight()
     };
+  }
+
+  /**
+   * searches non-manifold edges (duplicate and unpaired/single edges) and determines whether STL is one closed mesh or not.
+   * first sorts all triangles' edges according to their coordinates and uses binary search to find duplicate and unpaired edges, 
+   * if encounters one returns false otherwise true.
+   * @returns {boolean} - true: STL is watertight, false: STL is not watertight
+   */
+  _isWatertight() {
+    // sorted edge array will be used in binary search in order to find duplicate and unpaired edges
+    this.edges.sort(this.constructor._compareEdges);
+    
+    // duplicate edge search 
+    let previousEdge = this.edges[0];
+    for(let i = 1; i < this.edges.length; i++) {
+      const edge = this.edges[i];
+      if (this.constructor._compareEdges(previousEdge, edge) == 0) {
+        return false;
+      }
+      previousEdge = edge;
+    }
+
+    // pair edge search
+    for (let edgeIndex = 0; edgeIndex < this.edges.length; edgeIndex++) {
+      const edge = this.edges[edgeIndex];
+      if (edge.p == undefined) {
+        const pairEdge = {v: [edge.v[3], edge.v[4], edge.v[5], edge.v[0], edge.v[1], edge.v[2]], p: undefined};
+        
+        const pairEdgeIndex = this.constructor._binaryPairSearch(this.constructor._compareEdges, this.edges, pairEdge, edgeIndex + 1)
+
+        if (pairEdgeIndex != -1) { // pair found
+          edge.p = pairEdgeIndex;
+          this.edges[pairEdgeIndex].p = edgeIndex;
+        } else { // pair not found
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * searches given edge (pair edge) in the remaining sorted edge array
+   * returns -1 if pair is not found, index of the pair edge if it's found 
+   * @param {function} comparator - edge compare function
+   * @param {[]} sortedEdges - sorted edge array
+   * @param {{}} edge - edge: {v: [] - vector coordinates, p: int - pair edge index}
+   * @param {int} - start index for searching in sorted edge array
+   * @returns {int} - pair not found: -1, pair found: index of the pair edge
+   */
+  static _binaryPairSearch(comparator, sortedEdges, edge, start){
+    let end = sortedEdges.length - 1;
+
+    while (start <= end) {
+      let middle = Math.floor((start + end) / 2);
+
+      if (comparator(sortedEdges[middle], edge) == 0) {
+        // pair edge found
+        return middle;
+      } else if (comparator(sortedEdges[middle], edge) < 0) {
+        // continue searching to the right
+        start = middle + 1;
+      } else {
+        // continue searching to the left
+        end = middle - 1;
+      }
+    }
+	  // pair edge wasn't found
+    return -1;
+  }
+
+  /**
+   * compares two edges
+   * @param {{}} a - edge: {v: [] - vector coordinates, p: int - pair edge index}
+   * @param {{}} b - edge: {v: [] - vector coordinates, p: int - pair edge index}
+   * @returns {int}
+   */
+  static _compareEdges(a, b) {
+    if (a.v[0] == b.v[0]) {
+      if (a.v[1] == b.v[1]) {
+        if (a.v[2] == b.v[2]) {
+          if (a.v[3] == b.v[3]) {
+            if (a.v[4] == b.v[4]) {
+              return a.v[5] - b.v[5];
+            } else {
+              return a.v[4] - b.v[4];
+            }
+          } else {
+            return a.v[3] - b.v[3];
+          }
+        } else {
+          return a.v[2] - b.v[2];
+        }
+      } else {
+        return a.v[1] - b.v[1];
+      }
+    } else {
+      return a.v[0] - b.v[0];
+    }
   }
 }
 

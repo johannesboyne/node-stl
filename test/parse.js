@@ -22,6 +22,7 @@ describe("should load an STL and measure volume, weight, and area", function() {
       }),
       [60, 45, 50]
     );
+    assert.equal(c.isWatertight, false);
   });
   it("loads the box_2x3x4 with area of 52 and volume of 24", function() {
     // source for this stl: http://www.thingiverse.com/thing:1607628
@@ -41,6 +42,7 @@ describe("should load an STL and measure volume, weight, and area", function() {
       }),
       [1.50001, 1.5, 1.5]
     );
+    assert.equal(d.isWatertight, true);
   });
   it("loads a binary file that starts with solid", function() {
     // source for this stl: http://www.thingiverse.com/thing:2462372
